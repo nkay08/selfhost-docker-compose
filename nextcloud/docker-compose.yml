@@ -1,0 +1,94 @@
+version: '3'
+
+services:
+
+  db:
+    image: mariadb
+    container_name: mariadb
+#    networks:
+#      - proxy
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+#    networks:
+#      - default
+
+  app:
+    image: nextcloud:fpm
+    container_name: nextcloud
+    restart: unless-stopped
+    volumes:
+      - nextcloud:/var/www/html
+      - config:/var/www/html/config
+      - custom_apps:/var/www/html/custom_apps
+      - data:/var/www/html/data
+      - apps:/var/www/html/apps
+      - themes:/var/www/themes
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+#      - VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=443
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_HOST=db
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+#    links:
+#     - web-nc
+    depends_on:
+      - db
+#      - letsencrypt
+#      - proxy
+#    networks:
+#      - proxy
+#      - default
+
+  web-nc:
+    image: nginx:alpine
+#    build: ./web
+    container_name: nkay.info-web-nc
+    restart: unless-stopped
+#    links:
+#     - app
+    volumes:
+      - nextcloud:/var/www/html:ro
+      - ./web/nginx.conf:/etc/nginx/nginx.conf:ro
+#    volumes_from:
+#      - app
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_PORT=443
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+    depends_on:
+#      - proxy
+      - app
+    networks:
+      - proxy
+      - default
+
+
+
+volumes:
+  db:
+  nextcloud:
+  apps:
+  data:
+  config:
+  custom_apps:
+  themes:
+
+networks:
+  proxy:
+    external:
+      name: nginx_network
