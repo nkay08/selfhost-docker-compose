@@ -57,7 +57,7 @@ services:
   web-nc:
     image: nginx:alpine
 #    build: ./web
-    container_name: nkay.info-web-nc
+    container_name: web-nc
     restart: unless-stopped
 #    links:
 #     - app
