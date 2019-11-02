@@ -5,7 +5,7 @@ STRING=$(cat <<- EOM
   port=80,443
   protocol=tcp
   filter=nextcloud
-  logpath=/var/lib/docker/volumes/nkayinfonextcloud_data/_data/nextcloud.log
+  logpath=/var/lib/docker/volumes/nextcloud_data/_data/nextcloud.log
 EOM
 )
 
