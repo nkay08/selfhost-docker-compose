@@ -1,5 +1,5 @@
 # selfhost-docker-compose
-Docker-compose configuration files for rrunning several services behind a nginx proxy.
+Docker-compose configuration files for running several services behind a nginx proxy.
 
 ## Prerequisites
 - docker
